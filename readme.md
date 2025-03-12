@@ -14,7 +14,7 @@
 
 2. **Access the repository:**
     ```bash
-    cd UR5_IsaacLab/ur5
+    cd UR5_IsaacLab
     ```
 
 3. **Activate the conda environment:**

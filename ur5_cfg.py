@@ -5,11 +5,11 @@ from isaaclab.utils.assets import ISAACLAB_NUCLEUS_DIR
 import os
 import math
 # configuration
-
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UR5_CFG = ArticulationCfg(
     prim_path="/ur5",
     spawn=sim_utils.UsdFileCfg(
-        usd_path=os.environ['HOME'] + "/ros2_ws/src/UR5_IsaacLab/assets/ur5/ur5.usd",
+        usd_path = os.path.join(BASE_DIR, "assets", "ur5", "ur5.usd"),
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             rigid_body_enabled=True,
             max_linear_velocity=1000.0,
