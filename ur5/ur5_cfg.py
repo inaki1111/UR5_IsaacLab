@@ -9,7 +9,7 @@ import math
 UR5_CFG = ArticulationCfg(
     prim_path="/ur5",
     spawn=sim_utils.UsdFileCfg(
-        usd_path=os.environ['HOME'] + "/ros2_ws/src/moveit_ur_config/config/ur5/ur5.usd",
+        usd_path=os.environ['HOME'] + "/ros2_ws/src/UR5_IsaacLab/assets/ur5/ur5.usd",
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             rigid_body_enabled=True,
             max_linear_velocity=1000.0,
