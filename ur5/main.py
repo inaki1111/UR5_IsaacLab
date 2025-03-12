@@ -1,8 +1,8 @@
 import argparse
 from isaaclab.app import AppLauncher
 
-parser = argparse.ArgumentParser(description="Entrenamiento.")
-parser.add_argument("--num_envs", type=int, default=9, help="Número de entornos a generar.")
+parser = argparse.ArgumentParser(description="training.")
+parser.add_argument("--num_envs", type=int, default=9, help="number of enviroments.")
 AppLauncher.add_app_launcher_args(parser)
 args_cli = parser.parse_args()
 
@@ -44,7 +44,7 @@ def run_simulation(sim: sim_utils.SimulationContext, entities: dict, origins: to
             joint_vel = robot.data.default_joint_vel.clone()
             robot.write_joint_state_to_sim(desired_joint_pos, joint_vel)
             robot.reset()
-            print("[INFO]: Estado del robot reseteado...")
+            print("robot reseted")
         # No se aplican esfuerzos; se mantiene la pose
         efforts = torch.zeros_like(robot.data.joint_pos)
         robot.set_joint_effort_target(efforts)
@@ -60,7 +60,7 @@ def main():
     scene_entities, origins = design_scene()
     origins_tensor = torch.tensor(origins, device=sim.device)
     sim.reset()
-    print("[INFO]: Configuración completa, iniciando simulación...")
+    print("Starting simulation...")
     run_simulation(sim, scene_entities, origins_tensor)
     simulation_app.close()
 
