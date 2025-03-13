@@ -24,14 +24,9 @@
 
 4. **Run the code:**
     ```bash
-    python main.py
+    python main.py --enable_cameras
     ```
 
-
-4. **Latest code:**
-    ```bash
-    python main2.py --enable_cameras
-    ```
 
 5. **Watch the robot camera**
     ![UR5 Isaac Lab](images/1.png)
