@@ -32,3 +32,7 @@
     ```bash
     python main2.py --enable_cameras
     ```
+
+5. **Watch the robot camera**
+    ![UR5 Isaac Lab](images/1.png)
+    ![UR5 Isaac Lab](images/2.png)
