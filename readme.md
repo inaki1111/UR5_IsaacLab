@@ -28,6 +28,7 @@
     ```
 
 5. **Run the controller:**
+    Test of the Differential IK Controller given by the example in isaac lab with the UR5
     ```bash
     python diff_ik.py --enable_cameras
     ```
