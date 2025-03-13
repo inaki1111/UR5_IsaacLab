@@ -27,7 +27,11 @@
     python main.py --enable_cameras
     ```
 
+5. **Run the controller:**
+    ```bash
+    python diff_ik.py --enable_cameras
+    ```
 
-5. **Watch the robot camera**
+6. **Watch the robot camera**
     ![UR5 Isaac Lab](images/1.png)
     ![UR5 Isaac Lab](images/2.png)

@@ -20,6 +20,7 @@ from isaaclab.utils import configclass
 from ur5_cfg import UR5_CFG
 from scene import MyInteractiveSceneCfg
 
+
 def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
     sim_dt = sim.get_physics_dt()
     sim_time = 0.0
