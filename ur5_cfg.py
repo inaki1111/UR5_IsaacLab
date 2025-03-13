@@ -26,14 +26,14 @@ UR5_CFG = ArticulationCfg(
     init_state=ArticulationCfg.InitialStateCfg(
         pos=(0.0, 0.0, 0.0),
         joint_pos={
-            "shoulder_pan_joint": math.radians(132.0),
-            "shoulder_lift_joint": math.radians(-8.9),
-            "elbow_joint": math.radians(-86.3),
-            "wrist_1_joint": math.radians(-104.0),
-            "wrist_2_joint": math.radians(-1.0),
-            "wrist_3_joint": math.radians(33.0),
-            "robotiq_85_left_knuckle_joint": math.radians(26.0),
-            "robotiq_85_right_knuckle_joint": math.radians(26.0),
+            "shoulder_pan_joint": math.radians(-7.0),    # 132.0
+            "shoulder_lift_joint": math.radians(-85.0),    # -8.9
+            "elbow_joint": math.radians(113.0),           # -86.3
+            "wrist_1_joint": math.radians(-117.0),        # -104.0
+            "wrist_2_joint": math.radians(-90.0),          # -1.0
+            "wrist_3_joint": math.radians(-8.0),          #  33.0
+            "robotiq_85_left_knuckle_joint": math.radians(0.0),  # 26.0
+            "robotiq_85_right_knuckle_joint": math.radians(0.0), # 26.0
         }
     ),
     actuators={
