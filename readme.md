@@ -30,5 +30,5 @@
 
 4. **Latest code:**
     ```bash
-    python main1.py
+    python main2.py --enable_cameras
     ```

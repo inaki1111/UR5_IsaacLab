@@ -1,10 +1,12 @@
 import argparse
 from isaaclab.app import AppLauncher
-parser = argparse.ArgumentParser(description="UR5 robot")
+parser = argparse.ArgumentParser(description="UR5 ")
+parser.add_argument("--num_envs", type=int, default=9, help="Number of environments to spawn")
 AppLauncher.add_app_launcher_args(parser)
 args_cli = parser.parse_args()
 app_launcher = AppLauncher(args_cli)
 simulation_app = app_launcher.app
+
 import os
 import math
 import numpy as np
@@ -20,9 +22,18 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 @configclass
 class MyInteractiveSceneCfg(InteractiveSceneCfg):
-    ground = AssetBaseCfg(prim_path="/World/defaultGroundPlane", spawn=sim_utils.GroundPlaneCfg())
-    light = AssetBaseCfg(prim_path="/World/Light", spawn=sim_utils.DomeLightCfg(intensity=2000.0, color=(0.75, 0.75, 0.75)))
-    table = AssetBaseCfg(prim_path="/World/Table", spawn=sim_utils.UsdFileCfg(usd_path=os.path.join(BASE_DIR, "assets", "table.usd")))
+    ground = AssetBaseCfg(
+        prim_path="/World/defaultGroundPlane",
+        spawn=sim_utils.GroundPlaneCfg()
+    )
+    light = AssetBaseCfg(
+        prim_path="/World/Light",
+        spawn=sim_utils.DomeLightCfg(intensity=2000.0, color=(0.75, 0.75, 0.75))
+    )
+    table = AssetBaseCfg(
+        prim_path="{ENV_REGEX_NS}/Table",
+        spawn=sim_utils.UsdFileCfg(usd_path=os.path.join(BASE_DIR, "assets", "table.usd"))
+    )
     ur5: ArticulationCfg = UR5_CFG.replace(prim_path="{ENV_REGEX_NS}/ur5")
     ur5.init_state.pos = (-0.7, 0.0, 0.63)
     camera = CameraCfg(
@@ -32,9 +43,14 @@ class MyInteractiveSceneCfg(InteractiveSceneCfg):
         width=640,
         data_types=["rgb", "distance_to_image_plane"],
         spawn=sim_utils.PinholeCameraCfg(
-            focal_length=11.2, focus_distance=2.2, horizontal_aperture=6.4, clipping_range=(0.1, 1.0e5)
+            focal_length=11.2, focus_distance=2.2, horizontal_aperture=6.4,
+            clipping_range=(0.1, 1.0e5)
         ),
-        offset=CameraCfg.OffsetCfg(pos=(0.14729, -0.01019, -0.02615), rot=(0.5, 0.5, -0.5, 0.5), convention="ros")
+        offset=CameraCfg.OffsetCfg(
+            pos=(0.14729, -0.01019, -0.02615),
+            rot=(0.5, 0.5, -0.5, 0.5),
+            convention="ros"
+        )
     )
 
 def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
@@ -46,7 +62,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
         if count % 200 == 0:
             count = 0
             root_state = ur5.data.default_root_state.clone()
-            root_state[:, :3] += scene.env_origins[0]
+            root_state[:, :3] += scene.env_origins
             ur5.write_root_pose_to_sim(root_state[:, :7])
             ur5.write_root_velocity_to_sim(root_state[:, 7:])
             joint_pos = ur5.data.default_joint_pos.clone()
@@ -63,16 +79,15 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
         sim_time += sim_dt
         count += 1
         ur5.update(sim_dt)
-        #print("RGB shape:", scene["camera"].data.output["rgb"].shape)
 
 def main():
     sim_cfg = sim_utils.SimulationCfg(device=args_cli.device)
     sim = sim_utils.SimulationContext(sim_cfg)
     sim.set_camera_view([3.5, 0.0, 3.2], [0.0, 0.0, 0.5])
-    scene_cfg = MyInteractiveSceneCfg(num_envs=1, env_spacing=2.0)
+    scene_cfg = MyInteractiveSceneCfg(num_envs=args_cli.num_envs, env_spacing=3.0)
     scene = InteractiveScene(scene_cfg)
     sim.reset()
-    print("config complete")
+    #print("config complete")
     run_simulator(sim, scene)
 
 if __name__ == "__main__":
