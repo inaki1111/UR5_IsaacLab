@@ -66,7 +66,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             ur5.reset()
             diff_ik_controller.reset()
             diff_ik_controller.set_command(ik_commands)
-            print("Reiniciando UR5 y cambiando objetivo")
+            print("change pos")
             current_goal_idx = (current_goal_idx + 1) % len(ee_goals)
             ik_commands[:] = ee_goals[current_goal_idx]
         else:
