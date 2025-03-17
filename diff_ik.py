@@ -1,7 +1,7 @@
 import argparse
 from isaaclab.app import AppLauncher
 parser = argparse.ArgumentParser(description="UR5 with Differential IK Controller")
-parser.add_argument("--num_envs", type=int, default=1, help="Number of environments to spawn")
+parser.add_argument("--num_envs", type=int, default=9, help="Number of environments to spawn")
 AppLauncher.add_app_launcher_args(parser)
 args_cli = parser.parse_args()
 app_launcher = AppLauncher(args_cli)
