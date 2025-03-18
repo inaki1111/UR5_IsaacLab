@@ -55,8 +55,8 @@ UR5_CFG = ArticulationCfg(
             joint_names_expr=["robotiq_85_left_knuckle_joint"],
             effort_limit=100.0,
             velocity_limit=3.0,
-            stiffness=0.0,
-            damping=0.1,
+            stiffness=200.0,
+            damping=10.0,
         ),
     }
 )

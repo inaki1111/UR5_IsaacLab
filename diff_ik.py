@@ -1,7 +1,7 @@
 import argparse
 from isaaclab.app import AppLauncher
 parser = argparse.ArgumentParser(description="UR5 with Differential IK Controller")
-parser.add_argument("--num_envs", type=int, default=9, help="Number of environments to spawn")
+parser.add_argument("--num_envs", type=int, default=1, help="Number of environments to spawn")
 AppLauncher.add_app_launcher_args(parser)
 args_cli = parser.parse_args()
 app_launcher = AppLauncher(args_cli)
@@ -43,11 +43,11 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
     ee_jacobi_idx = robot_entity_cfg.body_ids[0] - 1
 
     ee_goals = [
-        [0.5,  0.0, 0.5, 0.0, 0.0, 0.0, 1.0],  # (x,y,z,qz,qy,qz,qw)
-        [0.8, -0.2, 0.55, 0.0, 0.0, 0.0, 1.0],  
-        [0.4,  0.4, 0.65, 0.0, 0.0, 0.0, 1.0],  
-        [0.6, -0.3, 0.7, 0.0, 0.0, 0.0, 1.0],   
-        [0.3, -0.1, 0.45, 0.0, 0.0, 0.0, 1.0]  
+        [0.0,  0.0, 0.0, 0.0, 0.0, 0.0, 0.0],  # (x,y,z,qz,qy,qz,qw)
+        [0.0,  0.0, 0.0, 0.0, 0.0, 0.0, 0.0],  
+        [0.0,  0.0, 0.0, 0.0, 0.0, 0.0, 0.0],  
+        [0.0,  0.0, 0.0, 0.0, 0.0, 0.0, 0.0],   
+        [0.0,  0.0, 0.0, 0.0, 0.0, 0.0, 0.0] 
     ]
 
     ee_goals = torch.tensor(ee_goals, device=sim.device)
