@@ -9,7 +9,7 @@ from ur5_cfg import UR5_CFG
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 @configclass
-class MyInteractiveSceneCfg(InteractiveSceneCfg):
+class scene_config(InteractiveSceneCfg):
     ground = AssetBaseCfg(
         prim_path="/World/defaultGroundPlane",
         spawn=sim_utils.GroundPlaneCfg()

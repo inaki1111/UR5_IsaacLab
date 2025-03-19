@@ -19,7 +19,9 @@ from isaaclab.managers import SceneEntityCfg
 from isaaclab.utils.math import subtract_frame_transforms
 
 from ur5_cfg import UR5_CFG
-from scene import scene_config 
+from scene import scene_config
+from controller import apply_diff_ik_controller
+from controller import control_gripper
 
 def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
     sim_dt = sim.get_physics_dt()
@@ -40,8 +42,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
         body_names=["wrist_3_link"]
     )
     robot_entity_cfg.resolve(scene)
-    ee_jacobi_idx = robot_entity_cfg.body_ids[0] - 1
-
+    
     ee_goals = [
         [0.5,  0.0, 0.5, 0.0, 0.0, 0.0, 1.0],  # (x,y,z,qz,qy,qz,qw)
         [0.8, -0.2, 0.55, 0.0, 0.0, 0.0, 1.0],  
@@ -50,9 +51,9 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
         [0.3, -0.1, 0.45, 0.0, 0.0, 0.0, 1.0]  
     ]
     ee_goals = torch.tensor(ee_goals, device=sim.device)
-    current_goal_idx = 0
-    ik_commands = torch.zeros(scene.num_envs, diff_ik_controller.action_dim, device=sim.device)
-    ik_commands[:] = ee_goals[current_goal_idx]
+    goal = ee_goals[0]  # Se utiliza únicamente la primera posición
+
+    gripper_open = True  # Estado inicial del gripper
 
     count = 0
     while simulation_app.is_running():
@@ -60,26 +61,23 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
         if count % 150 == 0:
             count = 0
             joint_pos = ur5.data.default_joint_pos.clone()
+            print(joint_pos)
             joint_vel = ur5.data.default_joint_vel.clone()
             ur5.write_joint_state_to_sim(joint_pos, joint_vel)
             ur5.reset()
             diff_ik_controller.reset()
-            diff_ik_controller.set_command(ik_commands)
-            print("change pos")
-            current_goal_idx = (current_goal_idx + 1) % len(ee_goals)
-            ik_commands[:] = ee_goals[current_goal_idx]
+            print("Reiniciando estado, objetivo fijo a la primera posición")
+            ee_pose = ur5.data.body_state_w[:, robot_entity_cfg.body_ids[0], 0:7]
+            print("Current End-Effector Pose:", ee_pose)
+            # No se actualiza el goal, se mantiene la posición fija
         else:
-            jacobian = ur5.root_physx_view.get_jacobians()[:, ee_jacobi_idx, :, robot_entity_cfg.joint_ids]
-            ee_pose_w = ur5.data.body_state_w[:, robot_entity_cfg.body_ids[0], 0:7]
-            root_pose_w = ur5.data.root_state_w[:, 0:7]
-            joint_pos = ur5.data.joint_pos[:, robot_entity_cfg.joint_ids]
-            ee_pos_b, ee_quat_b = subtract_frame_transforms(
-                root_pose_w[:, :3], root_pose_w[:, 3:7],
-                ee_pose_w[:, :3], ee_pose_w[:, 3:7]
-            )
-            joint_pos_des = diff_ik_controller.compute(ee_pos_b, ee_quat_b, jacobian, joint_pos)
-            ur5.set_joint_position_target(joint_pos_des, joint_ids=robot_entity_cfg.joint_ids)
+            # Se aplica el controlador diferencial IK para alcanzar el goal fijo
+            apply_diff_ik_controller(ur5, diff_ik_controller, robot_entity_cfg, goal)
         
+        # Control del gripper: se alterna entre abierto y cerrado en cada iteración
+        control_gripper(ur5, gripper_open)
+        gripper_open = not gripper_open
+            
         scene.write_data_to_sim()
         sim.step()
         scene.update(sim_dt)

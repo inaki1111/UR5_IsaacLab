@@ -12,34 +12,13 @@ simulation_app = app_launcher.app
 import torch
 import isaaclab.sim as sim_utils
 from isaaclab.scene import InteractiveScene, InteractiveSceneCfg
-from ur5_cfg import UR5_CFG
-from scene import MyInteractiveSceneCfg
-
-def control_gripper(ur5, open=True):
-    """
-    Controla la apertura y cierre de la garra Robotiq 2F-85 modificando el target position.
-    """
-    gripper_joint_name = "robotiq_85_left_knuckle_joint"
-
-    if gripper_joint_name not in ur5.data.joint_names:
-        print(f"ERROR: No se encontró el joint {gripper_joint_name}")
-        return
-
-    gripper_joint_index = ur5.data.joint_names.index(gripper_joint_name)
-    
-    # Define valores de posición que correspondan a abierta y cerrada
-    pos_open = 40.0   # Ajusta este valor según tu configuración
-    pos_close = 0.0 # Ajusta este valor según tu configuración
-    
-    target_pos = ur5.data.joint_pos.clone()  # Copia el estado actual
-    target_pos[:, gripper_joint_index] = pos_open if open else pos_close
-    
-    ur5.set_joint_position_target(target_pos)
-    print(f"Garra {'abierta' if open else 'cerrada'}")
+from ur5_cfg import UR5_CFG # import robot config
+from scene import scene_config # import scene with the robot, table, cameras, etc
+from controller import control_gripper # import gripper controller
 
 def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
     sim_dt = sim.get_physics_dt()
-    gripper_open = True  # Estado inicial de la garra
+    gripper_open = True  # initial state of the gripper (open)
     cycle_count = 0      # Contador para saber cuándo reiniciar la simulación
 
     while simulation_app.is_running():
@@ -82,7 +61,7 @@ def main():
     sim = sim_utils.SimulationContext(sim_cfg)
     sim.set_camera_view([3.5, 0.0, 3.2], [0.0, 0.0, 0.5])
 
-    scene_cfg = MyInteractiveSceneCfg(num_envs=args_cli.num_envs, env_spacing=3.0)
+    scene_cfg = scene_config(num_envs=args_cli.num_envs, env_spacing=3.0)
     scene = InteractiveScene(scene_cfg)
 
     sim.reset()
