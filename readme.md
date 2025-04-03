@@ -36,3 +36,8 @@
 6. **Watch the robot camera**
     ![UR5 Isaac Lab](images/1.png)
     ![UR5 Isaac Lab](images/2.png)
+
+6. **To run the cube**
+    ```bash
+    python grab_cube.py 
+    ```
