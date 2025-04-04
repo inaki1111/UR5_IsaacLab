@@ -1,5 +1,16 @@
 import argparse
 from isaaclab.app import AppLauncher
+
+# Primero se debe lanzar la simulación (AppLauncher)
+parser = argparse.ArgumentParser(description="UR5 with Differential IK Controller")
+parser.add_argument("--num_envs", type=int, default=1, help="Number of environments")
+AppLauncher.add_app_launcher_args(parser)
+args_cli = parser.parse_args()
+
+app_launcher = AppLauncher(args_cli)
+simulation_app = app_launcher.app
+
+# Luego se importa el resto de las librerías
 import time
 import os, math, torch
 import isaaclab.sim as sim_utils
@@ -12,12 +23,7 @@ from ur5_cfg import UR5_CFG
 from scene import scene_config
 from controller import control_gripper
 
-parser = argparse.ArgumentParser(description="UR5 with Differential IK Controller")
-parser.add_argument("--num_envs", type=int, default=1, help="Number of environments")
-AppLauncher.add_app_launcher_args(parser)
-args_cli = parser.parse_args()
-app_launcher = AppLauncher(args_cli)
-simulation_app = app_launcher.app
+
 
 def run_simulator(sim, scene):
     sim_dt = sim.get_physics_dt()

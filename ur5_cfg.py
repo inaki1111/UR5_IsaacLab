@@ -9,12 +9,12 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UR5_CFG = ArticulationCfg(
     prim_path="/ur5",
     spawn=sim_utils.UsdFileCfg(
-        usd_path = os.path.join(BASE_DIR, "assets", "ur5", "ur5.usd"),
+        usd_path = os.path.join(BASE_DIR, "assets", "ur5", "ur5_force.usd"),
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             rigid_body_enabled=True,
-            max_linear_velocity=1000.0,
-            max_angular_velocity=1000.0,
-            max_depenetration_velocity=100.0,
+            max_linear_velocity=10.0,
+            max_angular_velocity=10.0,
+            max_depenetration_velocity=10.0,
             enable_gyroscopic_forces=True,
         ),
         articulation_props=sim_utils.ArticulationRootPropertiesCfg(
@@ -47,15 +47,15 @@ UR5_CFG = ArticulationCfg(
                 "wrist_3_joint",
             ],
             effort_limit=87.0,
-            velocity_limit=15.0,
+            velocity_limit=5.0,
             stiffness=800.0,
             damping=40.0,
         ),
         "gripper_actuator": ImplicitActuatorCfg(
-            joint_names_expr=["robotiq_85_left_knuckle_joint"],
+            joint_names_expr=["robotiq_85_left_knuckle_joint","robotiq_85_right_knuckle_joint"],
             effort_limit=300.0,
             velocity_limit=3.0,
-            stiffness=200.0,
+            stiffness=20.0,
             damping=15.0,
         ),
     }
