@@ -59,7 +59,7 @@ class scene_config(InteractiveSceneCfg):
             target_frames=[FrameTransformerCfg.FrameCfg(
                 prim_path="{ENV_REGEX_NS}/Object"
             )],
-            debug_vis=True,
+            debug_vis=False,
             visualizer_cfg=marker_cfg
         )
 
@@ -70,7 +70,7 @@ class scene_config(InteractiveSceneCfg):
                 prim_path="{ENV_REGEX_NS}/ur5/wrist_3_link",
                 offset=OffsetCfg(pos=[0.0, 0.23, 0])  # offset for the gripper frame
             )],
-            debug_vis=True,
+            debug_vis=False,
             visualizer_cfg=marker_cfg
         )
 #rot=[0.0, 0.0, 0.70711, 0.70711]

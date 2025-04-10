@@ -1,7 +1,6 @@
 import argparse
 from isaaclab.app import AppLauncher
 
-# Primero se debe lanzar la simulación (AppLauncher)
 parser = argparse.ArgumentParser(description="UR5 with Differential IK Controller")
 parser.add_argument("--num_envs", type=int, default=1, help="Number of environments")
 AppLauncher.add_app_launcher_args(parser)
@@ -10,7 +9,6 @@ args_cli = parser.parse_args()
 app_launcher = AppLauncher(args_cli)
 simulation_app = app_launcher.app
 
-# Luego se importa el resto de las librerías
 import time
 import os, math, torch
 import isaaclab.sim as sim_utils
@@ -23,17 +21,41 @@ from ur5_cfg import UR5_CFG
 from scene import scene_config
 from controller import control_gripper
 
+# --- Función modificada de control_gripper ---
+def control_gripper(ur5, open=True):
+    left_joint_name = "robotiq_85_left_knuckle_joint"
+    right_joint_name = "robotiq_85_right_knuckle_joint"
 
+    # Obtener índices desde la lista de nombres
+    left_index = ur5.data.joint_names.index(left_joint_name)
+    right_index = ur5.data.joint_names.index(right_joint_name)
+
+    if open:
+        target_left = 0.0
+        target_right = 0.0
+    else:
+        # Se usan valores positivos para ambos dedos
+        target_left = math.radians(41.0)
+        target_right = math.radians(41.0)
+
+    # Crear tensor con los valores y los índices
+    gripper_target = torch.tensor([[target_left, target_right]], dtype=torch.float32, device=ur5.device)
+    joint_ids = torch.tensor([left_index, right_index], device=ur5.device)
+
+    # Depuración: imprimir valores establecidos
+    print(f"Setting gripper targets -> Left: {target_left:.4f} rad, Right: {target_right:.4f} rad")
+
+    ur5.set_joint_position_target(gripper_target, joint_ids=joint_ids)
 
 def run_simulator(sim, scene):
     sim_dt = sim.get_physics_dt()
     diff_ik_cfg = DifferentialIKControllerCfg(command_type="pose", use_relative_mode=False, ik_method="dls")
     diff_ik_controller = DifferentialIKController(diff_ik_cfg, num_envs=scene.num_envs, device=sim.device)
     
-    phase = "approach"  # "approach" or "move"
+    phase = "approach"  # Puede ser "approach" o "move"
     gripper_closed = False
-    wait_delay_before_closing = 3.0  # seconds to wait before closing gripper
-    wait_delay_after_closing = 3.0   # seconds to wait after closing gripper
+    wait_delay_before_closing = 3.0  # Tiempo (en segundos) antes de cerrar la garra
+    wait_delay_after_closing = 10.0   # Tiempo de espera después de cerrar la garra
     approach_time = None
     post_grasp_target = torch.tensor([[0.0, 0.5, 0.5]], device=sim.device).repeat(scene.num_envs, 1)
     
@@ -103,12 +125,17 @@ def run_simulator(sim, scene):
             else:
                 elapsed = time.time() - approach_time
                 if elapsed < wait_delay_before_closing:
+                    # Durante este tiempo se mantiene el estado de la garra
                     pass
                 elif elapsed < (wait_delay_before_closing + wait_delay_after_closing):
                     if not gripper_closed:
-                        control_gripper(ur5, True)  # Close gripper
+                        # Se cierra la garra; se utiliza 'open=False' para indicar cierre.
+                        control_gripper(ur5, open=False)
                         gripper_closed = True
                         print("Gripper closed. Waiting...")
+                    else:
+                        # Reiterar el comando de cierre para asegurar que el estado persiste.
+                        control_gripper(ur5, open=False)
                 else:
                     phase = "move"
                     print("Switching to move phase.")
@@ -123,7 +150,7 @@ def run_simulator(sim, scene):
 def main():
     sim_cfg = sim_utils.SimulationCfg(device=args_cli.device)
     sim = sim_utils.SimulationContext(sim_cfg)
-    sim.set_camera_view([1.5, 0.5, 0.8], [0.0, 0.5, 0.65])
+    sim.set_camera_view([-0.8, 2.0, 1.3], [-0.2, 0.3, 0.70])
     scene_cfg = scene_config(num_envs=args_cli.num_envs, env_spacing=3.0)
     scene = InteractiveScene(scene_cfg)
     sim.reset()

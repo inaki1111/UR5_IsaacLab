@@ -1,28 +1,28 @@
-import torch
-from isaaclab.utils.math import subtract_frame_transforms
 import math
-# gripper controller
-def control_gripper(ur5, open=True):
-    # Nombres de las articulaciones de la pinza
-    left_joint_name = "robotiq_85_left_knuckle_joint"
-    right_joint_name = "robotiq_85_right_knuckle_joint"  # Ajusta si es diferente
+import torch
 
-    # Índices en el vector de posiciones
+def control_gripper(ur5, open=True):
+    # Nombres de los joints de la garra
+    left_joint_name = "robotiq_85_left_knuckle_joint"
+    right_joint_name = "robotiq_85_right_knuckle_joint"
+
+    # Obtener índices desde la lista de nombres
     left_index = ur5.data.joint_names.index(left_joint_name)
     right_index = ur5.data.joint_names.index(right_joint_name)
 
-    # Valores de apertura y cierre (en grados o radianes según tu sistema)
-    pos_open = 0.0
-    pos_close = math.radians(35) 
+    if open:
+        target_left = 0.0
+        target_right = 0.0
+    else:
+        # Convertimos los grados a radianes:
+        target_left = math.radians(41.0)
+        target_right = math.radians(41.0)
 
-    # Target para ambos lados
-    left_target = pos_open if open else pos_close
-    right_target = left_target  # Espejo del otro lado
+    # Crear tensor con los valores (asegurando tipo float)
+    gripper_target = torch.tensor([[target_left, target_right]], dtype=torch.float32, device=ur5.device)
+    joint_ids = torch.tensor([left_index, right_index], device=ur5.device)
 
-    # Clonar el estado actual y modificar solo los de la pinza
-    target_pos = ur5.data.joint_pos.clone()
-    target_pos[:, left_index] = left_target
-    target_pos[:, right_index] = right_target
+    # Mensaje de depuración para verificar los targets
+    print(f"Setting gripper targets -> Left: {target_left:.4f} rad, Right: {target_right:.4f} rad")
 
-    # Aplicar el nuevo objetivo
-    ur5.set_joint_position_target(target_pos)
+    ur5.set_joint_position_target(gripper_target, joint_ids=joint_ids)
