@@ -20,18 +20,16 @@ from controller import control_gripper  # import gripper controller
 def run_simulator(sim, scene):
     sim_dt = sim.get_physics_dt()
 
-    # Obtener el robot de la escena
+
     ur5 = scene["ur5"]
 
-    # Inicializar el estado del robot
     joint_pos = ur5.data.default_joint_pos.clone()
     joint_vel = ur5.data.default_joint_vel.clone()
     ur5.write_joint_state_to_sim(joint_pos, joint_vel)
     ur5.reset()
 
-    # Control para abrir y cerrar la garra periódicamente
     gripper_open = True
-    toggle_interval = 3.0  # Intervalo en segundos para cambiar el estado
+    toggle_interval = 3.0  
     last_toggle_time = time.time()
 
     while simulation_app.is_running():
@@ -45,7 +43,7 @@ def run_simulator(sim, scene):
             control_gripper(ur5, open=gripper_open)
             last_toggle_time = current_time
 
-        # Actualizar la simulación
+
         ur5.write_data_to_sim()
         sim.step()
         scene.update(sim_dt)

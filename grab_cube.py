@@ -125,16 +125,14 @@ def run_simulator(sim, scene):
             else:
                 elapsed = time.time() - approach_time
                 if elapsed < wait_delay_before_closing:
-                    # Durante este tiempo se mantiene el estado de la garra
+
                     pass
                 elif elapsed < (wait_delay_before_closing + wait_delay_after_closing):
                     if not gripper_closed:
-                        # Se cierra la garra; se utiliza 'open=False' para indicar cierre.
                         control_gripper(ur5, open=False)
                         gripper_closed = True
                         print("Gripper closed. Waiting...")
                     else:
-                        # Reiterar el comando de cierre para asegurar que el estado persiste.
                         control_gripper(ur5, open=False)
                 else:
                     phase = "move"
