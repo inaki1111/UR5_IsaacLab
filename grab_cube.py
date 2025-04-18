@@ -86,7 +86,7 @@ def run_simulator(sim, scene):
         cube_rel_pos = cube_transform_sensor.data.target_pos_source
         if cube_rel_pos.dim() == 3:
             cube_rel_pos = cube_rel_pos.squeeze(1)
-        pregrasp_offset = 0.25
+        pregrasp_offset = 0.27
         cube_rel_pos[:, 2] = 0.01 + pregrasp_offset
 
         current_target = cube_rel_pos if phase == "approach" else post_grasp_target
